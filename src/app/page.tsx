@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Checkbox } from '@/components/ui/checkbox'
+import { useTheme } from '@/hooks/use-theme'
 import { 
   ArrowRight,
   CheckCircle2,
@@ -27,7 +28,9 @@ import {
   Target,
   Sparkles,
   Menu,
-  X
+  X,
+  Moon,
+  Sun
 } from 'lucide-react'
 
 // Sample Data
@@ -109,36 +112,56 @@ const LEARNING_RESOURCES = [
 ]
 
 // Navigation
-function Navigation() {
+function Navigation({ theme, toggleTheme, mounted }: { theme: 'light' | 'dark'; toggleTheme: () => void; mounted: boolean }) {
   const [isOpen, setIsOpen] = useState(false)
 
   return (
-    <nav className="bg-white border-b border-gray-200 sticky top-0 z-50">
+    <nav className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 sticky top-0 z-50 transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-14">
           <div className="flex items-center gap-2">
             <Sparkles className="w-5 h-5 text-emerald-600" />
-            <span className="font-bold text-gray-900">NXT-GEN SKILLFORGE</span>
+            <span className="font-bold text-gray-900 dark:text-gray-100">NXT-GEN SKILLFORGE</span>
           </div>
 
           <div className="hidden md:flex items-center gap-4 text-sm">
-            <a href="#skills" className="text-gray-600 hover:text-gray-900">My Skills</a>
-            <a href="#matching" className="text-gray-600 hover:text-gray-900">Job Matching</a>
-            <a href="#gaps" className="text-gray-600 hover:text-gray-900">Skill Gaps</a>
-            <a href="#learning" className="text-gray-600 hover:text-gray-900">Learning Path</a>
+            <a href="#skills" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 transition-colors">My Skills</a>
+            <a href="#matching" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 transition-colors">Job Matching</a>
+            <a href="#gaps" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 transition-colors">Skill Gaps</a>
+            <a href="#learning" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 transition-colors">Learning Path</a>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleTheme}
+              aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+              className="text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+            >
+              {mounted && theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+            </Button>
           </div>
 
-          <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setIsOpen(!isOpen)}>
-            {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-          </Button>
+          <div className="md:hidden flex items-center gap-1">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleTheme}
+              aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+              className="text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+            >
+              {mounted && theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+            </Button>
+            <Button variant="ghost" size="icon" className="dark:text-gray-100" onClick={() => setIsOpen(!isOpen)}>
+              {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </Button>
+          </div>
         </div>
 
         {isOpen && (
-          <div className="md:hidden py-2 border-t border-gray-200 space-y-2">
-            <a href="#skills" className="block py-1 text-gray-600">My Skills</a>
-            <a href="#matching" className="block py-1 text-gray-600">Job Matching</a>
-            <a href="#gaps" className="block py-1 text-gray-600">Skill Gaps</a>
-            <a href="#learning" className="block py-1 text-gray-600">Learning Path</a>
+          <div className="md:hidden py-2 border-t border-gray-200 dark:border-gray-800 space-y-2">
+            <a href="#skills" className="block py-1 text-gray-600 dark:text-gray-300">My Skills</a>
+            <a href="#matching" className="block py-1 text-gray-600 dark:text-gray-300">Job Matching</a>
+            <a href="#gaps" className="block py-1 text-gray-600 dark:text-gray-300">Skill Gaps</a>
+            <a href="#learning" className="block py-1 text-gray-600 dark:text-gray-300">Learning Path</a>
           </div>
         )}
       </div>
@@ -172,17 +195,17 @@ function SkillInputSection({
   }
 
   const getConfidenceColor = (conf: number) => {
-    if (conf >= 0.7) return 'text-green-600'
-    if (conf >= 0.4) return 'text-yellow-600'
-    return 'text-red-600'
+    if (conf >= 0.7) return 'text-green-600 dark:text-green-400'
+    if (conf >= 0.4) return 'text-yellow-600 dark:text-yellow-300'
+    return 'text-red-600 dark:text-red-400'
   }
 
   const getSourceBadge = (src: string) => {
     switch(src) {
-      case 'resume': return { label: 'Resume', color: 'bg-blue-100 text-blue-700' }
-      case 'github': return { label: 'GitHub', color: 'bg-purple-100 text-purple-700' }
-      case 'assessment': return { label: 'Assessment', color: 'bg-green-100 text-green-700' }
-      default: return { label: 'Manual', color: 'bg-gray-100 text-gray-700' }
+      case 'resume': return { label: 'Resume', color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-200' }
+      case 'github': return { label: 'GitHub', color: 'bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-200' }
+      case 'assessment': return { label: 'Assessment', color: 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-200' }
+      default: return { label: 'Manual', color: 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-200' }
     }
   }
 
@@ -220,11 +243,11 @@ function SkillInputSection({
           </div>
 
           {/* Add Skill Form */}
-          <div className="grid sm:grid-cols-4 gap-4 p-4 bg-gray-50 rounded-lg">
+          <div className="grid sm:grid-cols-4 gap-4 p-4 bg-gray-50 dark:bg-gray-900 rounded-lg transition-colors">
             <div>
-              <Label className="text-xs">Select Skill</Label>
+              <Label className="text-xs text-gray-700 dark:text-gray-200">Select Skill</Label>
               <select 
-                className="w-full mt-1 p-2 border rounded text-sm"
+                className="w-full mt-1 p-2 border rounded text-sm bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-700 text-gray-900 dark:text-gray-100"
                 value={selectedSkill}
                 onChange={(e) => setSelectedSkill(e.target.value)}
               >
@@ -239,7 +262,7 @@ function SkillInputSection({
               </select>
             </div>
             <div>
-              <Label className="text-xs">Confidence: {confidence}%</Label>
+              <Label className="text-xs text-gray-700 dark:text-gray-200">Confidence: {confidence}%</Label>
               <Input 
                 type="range" 
                 min="10" 
@@ -250,9 +273,9 @@ function SkillInputSection({
               />
             </div>
             <div>
-              <Label className="text-xs">Source</Label>
+              <Label className="text-xs text-gray-700 dark:text-gray-200">Source</Label>
               <select 
-                className="w-full mt-1 p-2 border rounded text-sm"
+                className="w-full mt-1 p-2 border rounded text-sm bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-700 text-gray-900 dark:text-gray-100"
                 value={source}
                 onChange={(e) => setSource(e.target.value)}
               >
@@ -272,27 +295,27 @@ function SkillInputSection({
 
           {/* Current Skills */}
           <div>
-            <h4 className="text-sm font-medium mb-3">Your Skills ({userSkills.length})</h4>
+            <h4 className="text-sm font-medium mb-3 text-gray-900 dark:text-gray-100">Your Skills ({userSkills.length})</h4>
             <div className="flex flex-wrap gap-2">
               {userSkills.map((s, i) => {
                 const badge = getSourceBadge(s.source)
                 return (
-                  <div key={i} className="flex items-center gap-1 px-3 py-1.5 bg-white border rounded-full">
-                    <span className="font-medium text-sm">{s.skill}</span>
+                  <div key={i} className="flex items-center gap-1 px-3 py-1.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-full transition-colors">
+                    <span className="font-medium text-sm text-gray-900 dark:text-gray-100">{s.skill}</span>
                     <span className={`text-xs ${getConfidenceColor(s.confidence)}`}>
                       {Math.round(s.confidence * 100)}%
                     </span>
                     <span className={`text-xs px-1.5 py-0.5 rounded ${badge.color}`}>
                       {badge.label}
                     </span>
-                    <button onClick={() => removeSkill(s.skill)} className="ml-1 text-gray-400 hover:text-red-500">
+                    <button onClick={() => removeSkill(s.skill)} className="ml-1 text-gray-500 dark:text-gray-300 hover:text-red-500 dark:hover:text-red-400 transition-colors">
                       <X className="w-3 h-3" />
                     </button>
                   </div>
                 )
               })}
               {userSkills.length === 0 && (
-                <p className="text-gray-400 text-sm">No skills added yet. Add your first skill above.</p>
+                <p className="text-gray-500 dark:text-gray-300 text-sm">No skills added yet. Add your first skill above.</p>
               )}
             </div>
           </div>
@@ -331,9 +354,9 @@ function JobMatchingSection({
   }
 
   const getMatchColor = (score: number) => {
-    if (score >= 80) return 'text-green-600 bg-green-50'
-    if (score >= 60) return 'text-yellow-600 bg-yellow-50'
-    return 'text-red-600 bg-red-50'
+    if (score >= 80) return 'text-green-700 bg-green-100 dark:text-green-200 dark:bg-green-900/40'
+    if (score >= 60) return 'text-yellow-700 bg-yellow-100 dark:text-yellow-200 dark:bg-yellow-900/40'
+    return 'text-red-700 bg-red-100 dark:text-red-200 dark:bg-red-900/40'
   }
 
   const sortedJobs = [...JOBS].sort((a, b) => calculateMatch(b) - calculateMatch(a))
@@ -350,7 +373,7 @@ function JobMatchingSection({
         </CardHeader>
         <CardContent>
           {userSkills.length === 0 ? (
-            <p className="text-gray-400 text-center py-8">Add your skills to see job matches</p>
+            <p className="text-gray-500 dark:text-gray-300 text-center py-8">Add your skills to see job matches</p>
           ) : (
             <div className="space-y-3">
               {sortedJobs.map((job) => {
@@ -358,11 +381,11 @@ function JobMatchingSection({
                 const userSkillNames = userSkills.map(s => s.skill)
                 
                 return (
-                  <div key={job.id} className="border rounded-lg p-4">
+                  <div key={job.id} className="border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 rounded-lg p-4 transition-colors">
                     <div className="flex justify-between items-start">
                       <div>
-                        <h4 className="font-medium">{job.title}</h4>
-                        <p className="text-sm text-gray-500">{job.company} • {job.location}</p>
+                        <h4 className="font-medium text-gray-900 dark:text-gray-100">{job.title}</h4>
+                        <p className="text-sm text-gray-600 dark:text-gray-300">{job.company} • {job.location}</p>
                         <p className="text-sm text-emerald-600">{job.salary}</p>
                       </div>
                       <div className={`px-3 py-1 rounded-full text-lg font-bold ${getMatchColor(matchScore)}`}>
@@ -377,8 +400,8 @@ function JobMatchingSection({
                             key={skill} 
                             className={`text-xs px-2 py-0.5 rounded ${
                               userSkillNames.includes(skill) 
-                                ? 'bg-green-100 text-green-700' 
-                                : 'bg-red-100 text-red-700'
+                                ? 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-200' 
+                                : 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-200'
                             }`}
                           >
                             {userSkillNames.includes(skill) ? '✓' : '✗'} {skill}
@@ -442,7 +465,7 @@ function SkillGapSection({
         </CardHeader>
         <CardContent>
           {userSkills.length === 0 ? (
-            <p className="text-gray-400 text-center py-8">Add your skills to see gap analysis</p>
+            <p className="text-gray-500 dark:text-gray-300 text-center py-8">Add your skills to see gap analysis</p>
           ) : missingSkills.length === 0 ? (
             <div className="text-center py-8">
               <CheckCircle2 className="w-12 h-12 text-green-500 mx-auto mb-2" />
@@ -450,20 +473,20 @@ function SkillGapSection({
             </div>
           ) : (
             <div className="space-y-3">
-              <div className="grid grid-cols-12 gap-2 text-xs font-medium text-gray-500 px-2">
+              <div className="grid grid-cols-12 gap-2 text-xs font-medium text-gray-600 dark:text-gray-300 px-2">
                 <div className="col-span-4">Missing Skill</div>
                 <div className="col-span-2 text-center">Priority</div>
                 <div className="col-span-6">Required For</div>
               </div>
               {missingSkills.slice(0, 8).map((item, i) => (
-                <div key={i} className="grid grid-cols-12 gap-2 items-center p-3 bg-gray-50 rounded-lg">
-                  <div className="col-span-4 font-medium text-sm">{item.skill}</div>
+                <div key={i} className="grid grid-cols-12 gap-2 items-center p-3 bg-gray-50 dark:bg-gray-900 rounded-lg transition-colors">
+                  <div className="col-span-4 font-medium text-sm text-gray-900 dark:text-gray-100">{item.skill}</div>
                   <div className="col-span-2 text-center">
                     <Badge variant={item.count >= 3 ? 'destructive' : item.count >= 2 ? 'default' : 'secondary'}>
                       {item.count} jobs
                     </Badge>
                   </div>
-                  <div className="col-span-6 text-xs text-gray-500">
+                  <div className="col-span-6 text-xs text-gray-600 dark:text-gray-300">
                     {item.jobs.slice(0, 2).join(', ')}
                     {item.jobs.length > 2 && ` +${item.jobs.length - 2} more`}
                   </div>
@@ -513,7 +536,7 @@ function LearningPathSection({
         </CardHeader>
         <CardContent>
           {userSkills.length === 0 ? (
-            <p className="text-gray-400 text-center py-8">Add your skills to get learning recommendations</p>
+            <p className="text-gray-500 dark:text-gray-300 text-center py-8">Add your skills to get learning recommendations</p>
           ) : recommendedLearning.length === 0 ? (
             <div className="text-center py-8">
               <CheckCircle2 className="w-12 h-12 text-green-500 mx-auto mb-2" />
@@ -522,13 +545,13 @@ function LearningPathSection({
           ) : (
             <div className="space-y-3">
               {recommendedLearning.map((course, i) => (
-                <div key={i} className="flex items-center gap-4 p-3 border rounded-lg">
-                  <div className="w-8 h-8 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-sm">
+                <div key={i} className="flex items-center gap-4 p-3 border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 rounded-lg transition-colors">
+                  <div className="w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-200 flex items-center justify-center font-bold text-sm">
                     {i + 1}
                   </div>
                   <div className="flex-1">
-                    <h4 className="font-medium text-sm">{course.title}</h4>
-                    <p className="text-xs text-gray-500">
+                    <h4 className="font-medium text-sm text-gray-900 dark:text-gray-100">{course.title}</h4>
+                    <p className="text-xs text-gray-600 dark:text-gray-300">
                       {course.platform} • {course.duration} • {course.level}
                     </p>
                   </div>
@@ -562,7 +585,7 @@ function SkillGraphSection({
           <CardDescription>Visual representation of your skill connections</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="bg-gray-50 rounded-lg p-4 h-64 relative overflow-hidden">
+          <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-4 h-64 relative overflow-hidden transition-colors">
             <svg className="w-full h-full" viewBox="0 0 500 220">
               {/* Center - User */}
               <circle cx="250" cy="110" r="30" fill="#059669" />
@@ -603,13 +626,13 @@ function SkillGraphSection({
             </svg>
             
             {userSkills.length === 0 && (
-              <div className="absolute inset-0 flex items-center justify-center bg-white/80">
-                <p className="text-gray-400">Add skills to see graph</p>
+              <div className="absolute inset-0 flex items-center justify-center bg-white/80 dark:bg-gray-950/80">
+                <p className="text-gray-500 dark:text-gray-300">Add skills to see graph</p>
               </div>
             )}
           </div>
           
-          <div className="flex justify-center gap-6 mt-4 text-xs">
+          <div className="flex justify-center gap-6 mt-4 text-xs text-gray-700 dark:text-gray-200">
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 rounded-full bg-emerald-600" />
               <span>User</span>
@@ -644,20 +667,20 @@ function TeamSection() {
   ]
 
   return (
-    <section className="py-8 border-t">
+    <section className="py-8 border-t border-gray-200 dark:border-gray-800">
       <div className="text-center mb-6">
         <Badge variant="outline" className="mb-2">NEXT GEN BUILDERS</Badge>
         <h2 className="text-xl font-bold">Our Team</h2>
       </div>
       <div className="flex flex-wrap justify-center gap-4">
         {team.map((member, i) => (
-          <div key={i} className="text-center p-3 border rounded-lg w-36">
-            <div className="w-10 h-10 mx-auto rounded-full bg-emerald-100 flex items-center justify-center text-emerald-700 font-bold text-sm mb-2">
+          <div key={i} className="text-center p-3 border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 rounded-lg w-36 transition-colors">
+            <div className="w-10 h-10 mx-auto rounded-full bg-emerald-100 dark:bg-emerald-900/40 flex items-center justify-center text-emerald-700 dark:text-emerald-200 font-bold text-sm mb-2">
               {member.name.split(' ').map(n => n[0]).join('')}
             </div>
-            <p className="font-medium text-sm">{member.name}</p>
+            <p className="font-medium text-sm text-gray-900 dark:text-gray-100">{member.name}</p>
             <p className="text-xs text-emerald-600">{member.role}</p>
-            <p className="text-xs text-gray-400 mt-1">{member.college}</p>
+            <p className="text-xs text-gray-600 dark:text-gray-300 mt-1">{member.college}</p>
           </div>
         ))}
       </div>
@@ -667,6 +690,7 @@ function TeamSection() {
 
 // Main Page
 export default function Home() {
+  const { theme, toggleTheme, mounted } = useTheme()
   const [userSkills, setUserSkills] = useState<{ skill: string; confidence: number; source: string }[]>([
     { skill: 'JavaScript', confidence: 0.8, source: 'github' },
     { skill: 'React', confidence: 0.7, source: 'manual' },
@@ -675,14 +699,14 @@ export default function Home() {
   ])
 
   return (
-    <main className="min-h-screen bg-gray-50">
-      <Navigation />
+    <main className="min-h-screen bg-gray-50 dark:bg-gray-950 transition-colors">
+      <Navigation theme={theme} toggleTheme={toggleTheme} mounted={mounted} />
       
       <div className="max-w-4xl mx-auto px-4 py-6">
         {/* Header */}
         <div className="text-center mb-6">
-          <h1 className="text-2xl font-bold text-gray-900">NXT-GEN SKILLFORGE</h1>
-          <p className="text-gray-500 text-sm">Skill-intelligence platform for job matching & upskilling</p>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">NXT-GEN SKILLFORGE</h1>
+          <p className="text-gray-600 dark:text-gray-300 text-sm">Skill-intelligence platform for job matching & upskilling</p>
         </div>
 
         {/* Stats Bar */}
@@ -693,9 +717,9 @@ export default function Home() {
             { label: 'Skill Gaps', value: Math.max(0, 15 - userSkills.length) },
             { label: 'Learning', value: userSkills.length > 0 ? 4 : 0 }
           ].map((stat, i) => (
-            <div key={i} className="bg-white border rounded-lg p-3 text-center">
+            <div key={i} className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-3 text-center transition-colors">
               <div className="text-xl font-bold text-emerald-600">{stat.value}</div>
-              <div className="text-xs text-gray-500">{stat.label}</div>
+              <div className="text-xs text-gray-600 dark:text-gray-300">{stat.label}</div>
             </div>
           ))}
         </div>
@@ -710,7 +734,7 @@ export default function Home() {
         {/* Footer */}
         <TeamSection />
         
-        <footer className="text-center py-6 text-sm text-gray-400 border-t mt-8">
+        <footer className="text-center py-6 text-sm text-gray-600 dark:text-gray-300 border-t border-gray-200 dark:border-gray-800 mt-8">
           © 2024 NXT-GEN SKILLFORGE - Next Gen Builders
         </footer>
       </div>
