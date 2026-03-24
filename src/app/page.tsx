@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Checkbox } from '@/components/ui/checkbox'
+import { useTheme } from '@/hooks/use-theme'
 import { 
   ArrowRight,
   CheckCircle2,
@@ -27,7 +28,9 @@ import {
   Target,
   Sparkles,
   Menu,
-  X
+  X,
+  Moon,
+  Sun
 } from 'lucide-react'
 
 // Sample Data
@@ -109,36 +112,56 @@ const LEARNING_RESOURCES = [
 ]
 
 // Navigation
-function Navigation() {
+function Navigation({ theme, toggleTheme, mounted }: { theme: 'light' | 'dark'; toggleTheme: () => void; mounted: boolean }) {
   const [isOpen, setIsOpen] = useState(false)
 
   return (
-    <nav className="bg-white border-b border-gray-200 sticky top-0 z-50">
+    <nav className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 sticky top-0 z-50 transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-14">
           <div className="flex items-center gap-2">
             <Sparkles className="w-5 h-5 text-emerald-600" />
-            <span className="font-bold text-gray-900">NXT-GEN SKILLFORGE</span>
+            <span className="font-bold text-gray-900 dark:text-gray-100">NXT-GEN SKILLFORGE</span>
           </div>
 
           <div className="hidden md:flex items-center gap-4 text-sm">
-            <a href="#skills" className="text-gray-600 hover:text-gray-900">My Skills</a>
-            <a href="#matching" className="text-gray-600 hover:text-gray-900">Job Matching</a>
-            <a href="#gaps" className="text-gray-600 hover:text-gray-900">Skill Gaps</a>
-            <a href="#learning" className="text-gray-600 hover:text-gray-900">Learning Path</a>
+            <a href="#skills" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 transition-colors">My Skills</a>
+            <a href="#matching" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 transition-colors">Job Matching</a>
+            <a href="#gaps" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 transition-colors">Skill Gaps</a>
+            <a href="#learning" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 transition-colors">Learning Path</a>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleTheme}
+              aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+              className="text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+            >
+              {mounted && theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+            </Button>
           </div>
 
-          <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setIsOpen(!isOpen)}>
-            {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-          </Button>
+          <div className="md:hidden flex items-center gap-1">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleTheme}
+              aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+              className="text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+            >
+              {mounted && theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+            </Button>
+            <Button variant="ghost" size="icon" className="dark:text-gray-100" onClick={() => setIsOpen(!isOpen)}>
+              {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </Button>
+          </div>
         </div>
 
         {isOpen && (
-          <div className="md:hidden py-2 border-t border-gray-200 space-y-2">
-            <a href="#skills" className="block py-1 text-gray-600">My Skills</a>
-            <a href="#matching" className="block py-1 text-gray-600">Job Matching</a>
-            <a href="#gaps" className="block py-1 text-gray-600">Skill Gaps</a>
-            <a href="#learning" className="block py-1 text-gray-600">Learning Path</a>
+          <div className="md:hidden py-2 border-t border-gray-200 dark:border-gray-800 space-y-2">
+            <a href="#skills" className="block py-1 text-gray-600 dark:text-gray-300">My Skills</a>
+            <a href="#matching" className="block py-1 text-gray-600 dark:text-gray-300">Job Matching</a>
+            <a href="#gaps" className="block py-1 text-gray-600 dark:text-gray-300">Skill Gaps</a>
+            <a href="#learning" className="block py-1 text-gray-600 dark:text-gray-300">Learning Path</a>
           </div>
         )}
       </div>
@@ -667,6 +690,7 @@ function TeamSection() {
 
 // Main Page
 export default function Home() {
+  const { theme, toggleTheme, mounted } = useTheme()
   const [userSkills, setUserSkills] = useState<{ skill: string; confidence: number; source: string }[]>([
     { skill: 'JavaScript', confidence: 0.8, source: 'github' },
     { skill: 'React', confidence: 0.7, source: 'manual' },
@@ -675,8 +699,8 @@ export default function Home() {
   ])
 
   return (
-    <main className="min-h-screen bg-gray-50">
-      <Navigation />
+    <main className="min-h-screen bg-gray-50 dark:bg-gray-950 transition-colors">
+      <Navigation theme={theme} toggleTheme={toggleTheme} mounted={mounted} />
       
       <div className="max-w-4xl mx-auto px-4 py-6">
         {/* Header */}
