@@ -39,6 +39,7 @@ type JobItem = {
   requiredSkills: string[]
   preferredSkills: string[]
 }
+import { signIn, signOut, useSession } from "next-auth/react"
 
 const FALLBACK_SKILLS: SkillCatalogItem[] = [
   { id: 1, name: 'JavaScript', category: 'Programming' },
@@ -167,7 +168,7 @@ function SkillInputSection({
   onResumeUpload,
   onGithubImport,
   onAssessment
-}: { 
+}: {
   userSkills: UserSkill[]
   onUserSkillsChange: (skills: UserSkill[]) => void
   allSkills: SkillCatalogItem[]
@@ -175,6 +176,7 @@ function SkillInputSection({
   onGithubImport: () => void
   onAssessment: () => void
 }) {
+  const { data: session } = useSession()
   const [selectedSkill, setSelectedSkill] = useState('')
   const [confidence, setConfidence] = useState(50)
   const [source, setSource] = useState('manual')
@@ -230,10 +232,28 @@ function SkillInputSection({
               <Upload className="w-4 h-4 mr-2" />
               Upload Resume
             </Button>
-            <Button variant="outline" size="sm" onClick={onGithubImport}>
+           {session ? (
+          <div className="flex items-center gap-1">
+            <Button variant="outline" size="sm" onClick={onGithubImport} className="bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 border-green-200 dark:border-green-800">
               <Github className="w-4 h-4 mr-2" />
-              Connect GitHub
+              Import from {session?.user?.name}
             </Button>
+            <Button 
+             variant="outline" 
+             size="sm" 
+             onClick={() => signOut()} 
+             className="px-2 text-gray-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
+             title="Disconnect GitHub"
+        >
+          <X className="w-4 h-4" />
+        </Button>
+      </div>
+    ) : (
+      <Button variant="outline" size="sm" onClick={() => signIn("github")}>
+        <Github className="w-4 h-4 mr-2" />
+        Connect GitHub
+      </Button>
+    )}
             <Button variant="outline" size="sm" onClick={onAssessment}>
               <FileText className="w-4 h-4 mr-2" />
               Take Assessment
@@ -720,6 +740,7 @@ function SkillGraphSection({ userSkills, jobs }: { userSkills: UserSkill[]; jobs
 export default function Home() {
   const { theme, toggleTheme, mounted } = useTheme()
   const { toast } = useToast()
+  const { data: session } = useSession()
   const resumeInputRef = useRef<HTMLInputElement>(null)
   const [userSkills, setUserSkills] = useState<UserSkill[]>([
     { skill: 'JavaScript', confidence: 0.8, source: 'github' },
@@ -901,14 +922,23 @@ export default function Home() {
   }; 
 
   const handleGithubImport = async () => {
-    const username = window.prompt('Enter your GitHub username')
-    if (!username) return
+    // We ask for the exact handle because the session name is a Display Name (e.g., "Divyan Shakya" instead of "divyanshakya966")
+    const exactUsername = window.prompt("To scan your repositories, please enter your exact GitHub username :");
+    
+    if (!exactUsername) {
+      return // User cancelled the prompt
+    }
+
     try {
-      const reposRes = await fetch(`https://api.github.com/users/${encodeURIComponent(username)}/repos?per_page=100`)
+      toast({ title: 'Scanning GitHub...', description: `Looking for skills in ${exactUsername}'s repositories.` })
+      
+      const reposRes = await fetch(`https://api.github.com/users/${encodeURIComponent(exactUsername)}/repos?per_page=100`)
       if (!reposRes.ok) throw new Error('GitHub request failed')
+      
       const repos = (await reposRes.json()) as Array<{ language: string | null }>
       const merged: UserSkill[] = []
       const seen = new Set<string>()
+      
       for (const repo of repos) {
         const lang = repo.language
         if (!lang) continue
@@ -920,14 +950,16 @@ export default function Home() {
           merged.push({ skill, confidence: 0.72, source: 'github' })
         }
       }
+      
       if (merged.length === 0) {
-        toast({ title: 'No skills imported', description: 'No recognizable languages found in public repositories.' })
+        toast({ title: 'No skills imported', description: `No recognizable languages found in ${exactUsername}'s public repositories.` })
         return
       }
+      
       setUserSkills((prev) => mergeSkills(prev, merged))
-      toast({ title: 'GitHub connected', description: `Imported ${merged.length} skills from ${username}.` })
+      toast({ title: 'Skills Imported!', description: `Successfully imported ${merged.length} skills from ${exactUsername}.` })
     } catch {
-      toast({ title: 'GitHub import failed', description: 'Could not fetch public repositories right now.' })
+      toast({ title: 'GitHub import failed', description: 'Could not fetch repositories. Please double-check the username.', variant: "destructive" })
     }
   }
 

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
+import Providers from "@/components/Providers";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -14,6 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  // ... (keep your existing metadata exactly as is)
   title: "NXT-GEN SKILLFORGE",
   description: "Skill-intelligence platform for job matching, gap analysis, and guided upskilling.",
   keywords: ["Skillforge", "job matching", "skills", "upskilling", "career intelligence", "Next.js"],
@@ -41,8 +43,11 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground transition-colors duration-200`}
       >
-        {children}
-        <Toaster />
+        {/* Wrap your children in the Providers component */}
+        <Providers>
+          {children}
+          <Toaster />
+        </Providers>
       </body>
     </html>
   );
