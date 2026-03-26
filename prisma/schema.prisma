@@ -12,19 +12,27 @@ datasource db {
 
 // User model - can be student or recruiter
 model User {
-  id            String       @id @default(cuid())
-  email         String       @unique
+  id            String    @id @default(cuid())
   name          String?
-  role          String       @default("student") // student, recruiter
+  email         String?   @unique
+  emailVerified DateTime? // Required by NextAuth
+  image         String?   // Required by NextAuth (GitHub avatar will go here)
+  
+  // Your custom fields
+  role          String    @default("student")
   avatar        String?
   bio           String?
   githubUrl     String?
   linkedinUrl   String?
   resumeUrl     String?
-  createdAt     DateTime     @default(now())
-  updatedAt     DateTime     @updatedAt
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
   
-  // Relations
+  // NextAuth Relations
+  accounts      Account[]
+  sessions      Session[]
+
+  // Your existing Relations
   userSkills    UserSkill[]
   skillGaps     SkillGap[]
   learningPaths LearningPath[]
@@ -178,4 +186,40 @@ model DemoStats {
   totalJobs     Int      @default(0)
   totalMatches  Int      @default(0)
   updatedAt     DateTime @updatedAt
+}
+
+//NextAuth required models at the bottom of the file ---
+model Account {
+  id                 String  @id @default(cuid())
+  userId             String
+  type               String
+  provider           String
+  providerAccountId  String
+  refresh_token      String?  
+  access_token       String?  
+  expires_at         Int?
+  token_type         String?
+  scope              String?
+  id_token           String?  
+  session_state      String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
 }
